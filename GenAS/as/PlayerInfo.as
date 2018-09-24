@@ -1,3 +1,6 @@
+/**
+ * AutoGen
+ */
 Class PlayerInfo{
 
     /** id */
