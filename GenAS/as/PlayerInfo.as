@@ -4,15 +4,15 @@
 Class PlayerInfo{
 
     /** id */
-    public int id;
+    public var id:int;
 
     /** 名字 */
-    public String name;//测试
+    public var name:String;//测试
 
     /**
      * 年龄
      */
-    public int age;
+    public var age:int;
 
     //测试吧
 

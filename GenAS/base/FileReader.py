@@ -11,7 +11,7 @@ from base.IFileHandle import *
 class FileReader(object):
 
     def __init__(self, fileHandler: IFileHandle):
-        self.fileHandler = fileHandler
+        self.fileHandler: IFileHandle = fileHandler
         pass
 
     '''
