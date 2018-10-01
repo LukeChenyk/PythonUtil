@@ -13,7 +13,16 @@ class GenASFileHandler(IFileHandle):
         self.curCheckLineIndex = -1
         pass
 
+    def reset(self):
+        self.hasFunLeftKuoHao = False
+        self.lastPropertyLineIndex = -1
+        self.curCheckLineIndex = -1
+        self.typeInfo = TypeInfo()
+        pass
+
     def handle(self, infile, outFile: str):
+        self.reset()
+
         oldlines = open(infile, encoding='utf-8').readlines()
         outFile = outFile.replace('.java', '.as')  # 更改后缀
         newfp = open(outFile, 'w', encoding='utf-8')
@@ -78,6 +87,7 @@ class GenASFileHandler(IFileHandle):
         code = code.replace(';', '')
         arr = code.split(' ')
         prop = Property(arr)
+        self.typeInfo.addProperty(prop)
         return 'public var ' + prop.variableName + ':'+prop.type+';'  # 默认修饰符是public
 
     def checkIsClassLine(self, code: str):  # 检测是不是类的定义
@@ -105,5 +115,18 @@ class Property(object):
         self.accessModefier: str = values[0]  # 访问修饰符
         self.type: str = values[1]  # 类型
         self.variableName = values[2]  # 变量名
+
+    pass
+
+
+class TypeInfo(object):
+
+    def __init__(self):
+        self.props = []
+        pass
+
+    def addProperty(self, prop: Property):
+        self.props.append(prop)
+        pass
 
     pass

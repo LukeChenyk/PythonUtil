@@ -40,7 +40,5 @@ class FileReader(object):
             if os.path.isfile(inFile):
                 self.fileHandler.handle(inFile, outFile)
 
-        # 当一个标志使用，文件夹列表第一个级别不打印
-        # i_dl = 0
         for dl in dirList:
             self.handleFiles(inPath + '/' + dl, outPath+"/"+dl)
