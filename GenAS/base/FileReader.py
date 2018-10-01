@@ -44,15 +44,3 @@ class FileReader(object):
         # i_dl = 0
         for dl in dirList:
             self.handleFiles(inPath + '/' + dl, outPath+"/"+dl)
-            # if(i_dl == 0):
-            #     i_dl = i_dl + 1
-            # else:
-            #     # 打印至控制台，不是第一个的目录
-            #     print('-' * (int(dirList[0])), dl)
-            #     # 打印目录下的所有文件夹和文件，目录级别+1
-
-        # for fl in fileList:
-        #     # 打印文件
-        #     print('-' * (int(dirList[0])), fl)
-        #     # 随便计算一下有多少个文件
-        #     allFileNum = allFileNum + 1

@@ -8,6 +8,9 @@ fileDoc = ["/**", " * AutoGen", " */"]
 class GenASFileHandler(IFileHandle):
 
     def __init__(self):
+        self.hasFunLeftKuoHao = False
+        self.lastPropertyLineIndex = -1
+        self.curCheckLineIndex = -1
         pass
 
     def handle(self, infile, outFile: str):
@@ -16,8 +19,16 @@ class GenASFileHandler(IFileHandle):
         newfp = open(outFile, 'w', encoding='utf-8')
 
         self.writeDoc(newfp)
+
+        newlines = []
         for s in oldlines:
-            newfp.write(self.parseJavaLine(s))
+            newlines.append(self.parseJavaLine(s))
+
+        for index, line in enumerate(newlines):
+            if line and index <= self.lastPropertyLineIndex:  # 去掉了成员方法
+                newfp.write(line)
+
+        newfp.write('\n}\n')
 
         newfp.close()
 
@@ -25,8 +36,28 @@ class GenASFileHandler(IFileHandle):
         for s in fileDoc:
             outFile.write(s + '\n')
 
-    # 检测这行是不是注释
+    def parseJavaLine(self, line: str):
+        self.curCheckLineIndex = self.curCheckLineIndex + 1
+        codeEndIndex, codeStartIndex = self.checkLineCommentIndex(line)
+        if codeEndIndex == -1:
+            return line
+        elif codeStartIndex == codeEndIndex:  # 没代码内容
+            return line
+        else:  # 前面是代码，后部分是注释
+            comment = line[codeEndIndex:]
+            code = line[codeStartIndex:codeEndIndex]
+            emptyStr = line[0:codeStartIndex]
+            if self.checkIsClassLine(code):
+                return line
+            elif self.checkIsProtertyLine(code):
+                code = self.parseJavaProperty(code)
+                self.lastPropertyLineIndex = self.curCheckLineIndex
+            else:
+                return line
 
+            return emptyStr + code + comment
+
+    # 检测这行是不是注释
     def checkLineCommentIndex(self, line: str):
         codeEndIndex = -1
         codeStartIndex = -1  # 有内容字符开始的地方
@@ -42,24 +73,8 @@ class GenASFileHandler(IFileHandle):
 
         return codeEndIndex, codeStartIndex
 
-    def parseJavaLine(self, line: str):
-        codeEndIndex, codeStartIndex = self.checkLineCommentIndex(line)
-        if codeEndIndex == -1:
-            return line
-        elif codeStartIndex == codeEndIndex:  # 没代码内容
-            return line
-        else:  # 前面是代码，后部分是注释
-            comment = line[codeEndIndex:]
-            code = line[codeStartIndex:codeEndIndex]
-            emptyStr = line[0:codeStartIndex]
-            if self.checkIsClassLine(code):
-                return line
-            elif self.checkIsProtertyLine(code):
-                code = self.parseJavaProperty(code)
-            return emptyStr + code + comment
-
     def parseJavaProperty(self, code: str):
-        code = code.replace('  ', ' ', -1)
+        code = code.replace('  ', ' ', -1)  # 两个空格全部替换成一个空格
         code = code.replace(';', '')
         arr = code.split(' ')
         prop = Property(arr)
@@ -73,6 +88,12 @@ class GenASFileHandler(IFileHandle):
 
     def checkIsProtertyLine(self, code: str):
         if (code.find('public') > -1 or code.find('private') > -1 or code.find('protect') > -1) and code.find(';') > -1:
+            return True
+        else:
+            return False
+
+    def checkIsFuntion(self, code: str):
+        if(code.find('public') > -1 or code.find('private') > -1 or code.find('protect') > -1) and code.find('(') > -1:
             return True
         else:
             return False

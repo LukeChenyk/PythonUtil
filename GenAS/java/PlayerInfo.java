@@ -13,4 +13,8 @@ Class PlayerInfo{
 
     //测试吧
 
+    public int sum(){
+        return 0;
+    }
+
 }

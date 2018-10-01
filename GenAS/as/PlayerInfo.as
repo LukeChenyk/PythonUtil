@@ -14,6 +14,4 @@ Class PlayerInfo{
      */
     public var age:int;
 
-    //测试吧
-
 }
