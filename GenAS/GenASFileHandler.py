@@ -20,30 +20,37 @@ class GenASFileHandler(IFileHandle):
         self.typeInfo = TypeInfo()
         pass
 
-    def handle(self, infile, outFile: str):
+    def handle(self, inPath: str, outPath: str, fileName: str):
         self.reset()
 
+        infile = inPath + '/' + fileName
         if infile.find('SM_') > -1:
             self.isRead = True
         else:
             self.isRead = False
 
         oldlines = open(infile, encoding='utf-8').readlines()
-        outFile = outFile.replace('.java', '.as')  # 更改后缀
-        newfp = open(outFile, 'w', encoding='utf-8')
-
-        self.writeDoc(newfp)
 
         newlines = []
         for s in oldlines:
             newlines.append(self.parseJavaLine(s))
+
+        path = outPath + '/' + self.typeInfo.packageName
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        outFile = path + '/' + fileName
+        outFile = outFile.replace('.java', '.as')  # 更改后缀
+        newfp = open(outFile, 'w', encoding='utf-8')
+
+        self.writeDoc(newfp)
 
         for index, line in enumerate(newlines):
             if line and index <= self.lastPropertyLineIndex:  # 去掉了成员方法
                 newfp.write(line)
 
         self.writeReadFunc(newfp)
-        newfp.write('\n}\n')
+        newfp.write('\n\t}\n}\n')
 
         newfp.close()
 
@@ -75,9 +82,11 @@ class GenASFileHandler(IFileHandle):
             comment = line[codeEndIndex:]
             code = line[codeStartIndex:codeEndIndex]
             emptyStr = line[0:codeStartIndex]
-            if self.checkIsClassLine(code):
+            if self.checkIsPackageLine(code):
+                code = self.parsePackage(code)
+            elif self.checkIsClassLine(code):
+                code = self.parseClass(code)
                 self.classDefineLineIndex = self.curCheckLineIndex  # 类名所在的行
-                return line
             elif self.checkIsProtertyLine(code):
                 code = self.parseJavaProperty(code)
                 self.lastPropertyLineIndex = self.curCheckLineIndex
@@ -87,9 +96,14 @@ class GenASFileHandler(IFileHandle):
             else:
                 return line
 
-            return emptyStr + code + comment
+            return '\t'+emptyStr + code + comment
 
     # ***************************************************************************
+
+    def parseClass(self, code: str):
+        code = code.replace('{', '')
+        return code + ' extends Message {'
+        pass
 
     def parseJavaProperty(self, code: str):
         code = code.replace('  ', ' ', -1)  # 两个空格全部替换成一个空格
@@ -102,6 +116,13 @@ class GenASFileHandler(IFileHandle):
 
     def parseJavaFunction(self, code: str):
         pass
+
+    def parsePackage(self, code: str):
+        code = code.replace('  ', ' ', -1)  # 两个空格全部替换成一个空格
+        arr = code.split(' ')
+        arr2 = arr[1].split('.')
+        self.typeInfo.setPackage(arr2[-2])  # 取倒数第二个为包名
+        return 'package com.protocol.' + self.typeInfo.packageName + ' {\n'
 
     # ***************************************************************************
 
@@ -120,6 +141,12 @@ class GenASFileHandler(IFileHandle):
                 return codeEndIndex, codeStartIndex
 
         return codeEndIndex, codeStartIndex
+
+    def checkIsPackageLine(self, code: str):  # 检测是不是包的定义
+        if code.find("package ") > -1:
+            return True
+        else:
+            return False
 
     def checkIsClassLine(self, code: str):  # 检测是不是类的定义
         if code.find("public class ") > -1:
@@ -183,10 +210,15 @@ class TypeInfo(object):
     def __init__(self):
         self.props = []
         self.isWrite: bool = True  # 默认为读
+        self.packageName = ''
         pass
 
     def addProperty(self, prop: Property):
         self.props.append(prop)
+        pass
+
+    def setPackage(self, name: str):
+        self.packageName = name
         pass
 
     pass

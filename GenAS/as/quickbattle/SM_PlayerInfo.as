@@ -1,29 +1,31 @@
 /**
  * AutoGen
  */
-public class SM_PlayerInfo{
+	package com.protocol.quickbattle {
+
+	public class SM_PlayerInfo  extends Message {
 
     /** id */
-    public var id:int;
+	    public var id:int;
 
     /** 名字 */
-    public var name:String;//测试
+	    public var name:String;//测试
 
     /**
      * 年龄
      */
-    public var age:int;
+	    public var age:int;
 
     /** 钱 */
-    public var money:long;
+	    public var money:long;
 
     /** 布尔 */
-    public var isAuto:Boolean;
+	    public var isAuto:Boolean;
 
-    public var aSimpleMap:Object;
+	    public var aSimpleMap:Object;
 
     /** a list */
-    public var aSimpleList:List<LevelChangeAndExp>;
+	    public var aSimpleList:List<LevelChangeAndExp>;
 
 		override protected function reading():Boolean {
 			id = readInt();
@@ -36,4 +38,5 @@ public class SM_PlayerInfo{
 			return true;
 		}
 
+	}
 }

@@ -28,7 +28,6 @@ class FileReader(object):
 
         for f in files:
             inFile = inPath + '/' + f
-            outFile = outPath + "/" + f
             if os.path.isdir(inFile):
                 # 排除隐藏文件夹。因为隐藏文件夹过多
                 if f[0] == '.':
@@ -38,7 +37,7 @@ class FileReader(object):
                     dirList.append(f)
 
             if os.path.isfile(inFile):
-                self.fileHandler.handle(inFile, outFile)
+                self.fileHandler.handle(inPath, outPath, f)
 
         for dl in dirList:
             self.handleFiles(inPath + '/' + dl, outPath+"/"+dl)

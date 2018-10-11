@@ -1,8 +1,9 @@
+package com.game.user.quickbattle.packet;
 
 /**
  * lilili
  */
-public class SM_PlayerInfo{
+public class SM_PlayerInfo {
 
     /** id */
     public int id;
