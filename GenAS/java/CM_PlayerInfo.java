@@ -1,11 +1,12 @@
 package com.game.user.quickbattle.packet;
 
 import java.util.List;
+import java.util.List;
 
 /**
  * lilili
  */
-public class SM_PlayerInfo {
+public class CM_PlayerInfo {
 
     /** id */
     public int id;

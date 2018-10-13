@@ -7,7 +7,7 @@ package com.protocol.quickbattle {
 	/**
 	 * AutoGen
 	 */
-	public class SM_PlayerInfo  extends Message {
+	public class CM_PlayerInfo  extends Message {
 	
 	    /** id */
 	    public var id:int;
@@ -38,17 +38,17 @@ package com.protocol.quickbattle {
 	
 	    public var oneByte:int;
 
-		override protected function reading():Boolean {
-			id = readInt();
-			name = readString();
-			age = readInt();
-			money = readLong();
-			isAuto = readBoolean();
-			aSimpleMap = readObject(MapType.INT, MapType.INT, null, null);
-			aSimpleList = readArray(MapType.BEAN, LevelChangeAndExp);
-			intList = readArray(MapType.INT, null);
-			oneBean = readBean(LevelChangeAndExp);
-			oneByte = readByte();
+		override protected function writing():Boolean {
+			id = writeInt();
+			name = writeString();
+			age = writeInt();
+			money = writeLong();
+			isAuto = writeBoolean();
+			aSimpleMap = writeObject(MapType.INT, MapType.INT, null, null);
+			aSimpleList = writeArray(MapType.BEAN, LevelChangeAndExp);
+			intList = writeArray(MapType.INT, null);
+			oneBean = writeBean(LevelChangeAndExp);
+			oneByte = writeByte();
 			return true;
 		}
 
