@@ -52,5 +52,9 @@ package com.protocol.quickbattle {
 			return true;
 		}
 
+		override public function getId():int {
+			return -xxxx;
+		}
+
 	}
 }

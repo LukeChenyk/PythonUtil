@@ -35,8 +35,10 @@ class Configs(object):
 
     Base_Import = {
         'Message': 'com.common.connect.structure.Message',
+        'Bean': 'com.common.connect.structure.Bean',
         'long': 'com.common.connect.utils.long',
-        'MapType': 'com.protocol.MapType'
+        'Map': 'com.protocol.MapType',
+        'Array': 'com.protocol.MapType'
     }
 
     pass

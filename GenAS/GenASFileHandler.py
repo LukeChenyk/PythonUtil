@@ -24,9 +24,13 @@ class GenASFileHandler(IFileHandle):
 
         infile = inPath + '/' + fileName
         if infile.find('SM_') > -1:
-            self.typeInfo.isWrite = False
-        else:
+            self.typeInfo.isRead = True
+            self.typeInfo.addImportType('Message')
+        elif infile.find('CM_') > -1:
             self.typeInfo.isWrite = True
+            self.typeInfo.addImportType('Message')
+        else:
+            self.typeInfo.addImportType('Bean')
 
         oldlines = open(infile, encoding='utf-8').readlines()
 
@@ -46,8 +50,12 @@ class GenASFileHandler(IFileHandle):
 
         if self.typeInfo.isWrite:
             self.writeWriteFunc(newfp)
-        else:
+            self.writeGetIdFunc(newfp)
+        elif self.typeInfo.isRead:
             self.writeReadFunc(newfp)
+            self.writeGetIdFunc(newfp)
+        else:
+            self.writeReadFunc(newfp)  # bean只需读的方法
 
         newfp.write('\n\t}\n}\n')
 
@@ -69,7 +77,7 @@ class GenASFileHandler(IFileHandle):
         pass
 
     def writeImport(self, outFile):
-        for s in Configs.Base_Import.values():
+        for s in self.typeInfo.importTypes:
             outFile.write('\timport ' + s + ';\n')
         outFile.write('\n')
         pass
@@ -104,6 +112,15 @@ class GenASFileHandler(IFileHandle):
         outFile.write('\t\t\treturn true;\n')
         outFile.write('\t\t}\n')
         pass
+
+    def writeGetIdFunc(self, outFile):
+        outFile.write('\n')
+        outFile.write('\t\toverride public function getId():int {\n')
+        outFile.write('\t\t\treturn -xxxx;\n')
+        outFile.write('\t\t}\n')
+        pass
+
+    # ***************************************************************************
 
     def parseJavaLine(self, line: str):
         self.curCheckLineIndex = self.curCheckLineIndex + 1
@@ -154,6 +171,8 @@ class GenASFileHandler(IFileHandle):
         arr = code.split(' ')
         prop = Property(arr)
         self.typeInfo.addProperty(prop)
+        if Configs.Base_Import.__contains__(prop.type):
+            self.typeInfo.addImportType(prop.type)
         return 'public var ' + prop.variableName + ':'+prop.getTypeName()+';'  # 默认修饰符是public
 
     def parseJavaFunction(self, code: str):
@@ -331,8 +350,10 @@ class TypeInfo(object):
 
     def __init__(self):
         self.props = []
-        self.isWrite: bool = True  # 默认为读
-        self.packageName = ''
+        self.isWrite: bool = False
+        self.isRead: bool = False
+        self.packageName: str = ''
+        self.importTypes: list = []
         pass
 
     def addProperty(self, prop: Property):
@@ -341,6 +362,14 @@ class TypeInfo(object):
 
     def setPackage(self, name: str):
         self.packageName = name
+        pass
+
+    def addImportType(self, type):
+        importStr = Configs.Base_Import[type]
+        if importStr in self.importTypes:
+            return
+
+        self.importTypes.append(importStr)
         pass
 
     pass
