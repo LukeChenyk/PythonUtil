@@ -228,7 +228,7 @@ class GenASFileHandler(IFileHandle):
             return False
 
     def checkIsMember(self,  code: str):
-        if code.find('public') > -1 or code.find('private') > -1 or code.find('protect') > -1:
+        if code.find('public ') > -1 or code.find('private ') > -1 or code.find('protect ') > -1:
             return True
         else:
             return False
